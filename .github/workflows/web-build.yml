@@ -1,0 +1,46 @@
+name: Web Assembly Build
+
+on:
+  workflow_dispatch:
+
+env:
+  # https://flet.dev/docs/publish#versioning
+  BUILD_NUMBER: 1
+  BUILD_VERSION: 1.0.0
+  PYTHON_VERSION: 3.12.2
+  FLUTTER_VERSION: 3.22.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Flet Build Web
+        run: |
+          flutter config --no-analytics
+          flet build web --base-url "https://qr-email.mnt.space/" --route-url-strategy hash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qr-email-wasm-artifact
+          path: build/web
+

@@ -1,0 +1,4 @@
+flet==0.23.2
+PyQRCode==1.2.1
+pypng
+urllib3==2.1.0
